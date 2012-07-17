@@ -2,8 +2,11 @@
 import numpy as np
 from numpy import cos, sin, pi
 
-from enthought.tvtk.api import tvtk
-from enthought.mayavi.scripts import mayavi2
+#from enthought.tvtk.api import tvtk
+from tvtk.api import tvtk
+
+#from enthought.mayavi.scripts import mayavi2
+from mayavi.scripts import mayavi2
 
 def aligned_points(grid, nz=1, period=1.0, maxshift=0.4):
     try:
@@ -93,7 +96,7 @@ if __name__ == '__main__':
     #path="/home/ben/run4"
 
     #g = file_import("../cbm18_dens8.grid_nx68ny64.nc")
-    g = file_import("data/cbm18_8_y064_x516_090309.nc")
+    g = file_import("/hwdisks/data/bd512/elm-pb/cbm18_8_y064_x516_090309.nc")
     #g = file_import("/home/ben/run4/reduced_y064_x256.nc")
     
     data = collect("P", tind=50, path=path)
