@@ -77,8 +77,10 @@ def create_grid(grid, data, period=1):
 
 @mayavi2.standalone
 def view3d(sgrid):
-    from enthought.mayavi.sources.vtk_data_source import VTKDataSource
-    from enthought.mayavi.modules.api import Outline, GridPlane
+    #from enthought.mayavi.sources.vtk_data_source import VTKDataSource
+    #from enthought.mayavi.modules.api import Outline, GridPlane
+    from mayavi.sources.vtk_data_source import VTKDataSource
+    from mayavi.modules.api import Outline, GridPlane
     
     mayavi.new_scene()
     src = VTKDataSource(data=sgrid)
@@ -92,7 +94,8 @@ if __name__ == '__main__':
     from boutdata import collect
     from boututils import file_import
     
-    path = "/media/449db594-b2fe-4171-9e79-2d9b76ac69b6/runs/data_33/"
+    path = "/hwdisks/data/adm518/data_33/"
+    #path = "/media/449db594-b2fe-4171-9e79-2d9b76ac69b6/runs/data_33/"
     #path="/home/ben/run4"
 
     #g = file_import("../cbm18_dens8.grid_nx68ny64.nc")
