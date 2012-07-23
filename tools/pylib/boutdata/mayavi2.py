@@ -115,7 +115,7 @@ if __name__ == '__main__':
     sgrid = create_grid(g, data, 10)
     
 
-    w = tvtk.XMLStructuredGridWriter(input=sgrid, file_name='sgrid.vts')
+    w = tvtk.XMLStructuredGridWriter(input=sgrid, file_name='cartesiangrid.vts')
     w.write()
     
     # View the structured grid

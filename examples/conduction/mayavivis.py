@@ -19,12 +19,13 @@ from mayavi.core.ui.api import MayaviScene, SceneEditor, MlabSceneModel
 
 T = collect("T", path="data")
 
+#t = 0
 #Returns the dataset from the variable to be plotted, here for a given time
 def T_time(t):
     return T[t,:,:,0]
 
 class Visualisation(HasTraits):
-    time = Range(0,len(T[:,0,0,0]))
+    time = Range(0,(len(T[:,0,0,0])-1))
     scene = Instance(MlabSceneModel, ())
     plot = Instance(PipelineBase)
 
@@ -35,14 +36,14 @@ class Visualisation(HasTraits):
 
     @on_trait_change('time, scene.activated')
     def update_plot(self):
-        t = 0
+        t = 0 # self.time
         self.plot = self.scene.mlab.imshow(T_time(self.time))
-        #if self.plot is None:
-        #    self.plot = self.scene.mlab.imshow(T_time(t))
-        #else:
-        #    self.plot.mlab_source.t = self.time #set(t=self.time)
+#        if self.plot is None:
+#            self.plot = self.scene.mlab.surf(T_time(t = self.time))
+#        else:
+#            self.plot.mlab_source.t = self.time #set(t=self.time)
 
-    view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene), height=250, width=300, show_label=False), Group( '_', 'time', ) )
+    view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene), height=250, width=300, show_label=False), Group( '_', 'time', ), resizable=True, )
 
 vis = Visualisation()
 vis.configure_traits()
