@@ -57,10 +57,15 @@ def collect(varname, xind=None, yind=None, zind=None, tind=None, path=".",yguard
         return None
     nfiles = len(file_list)
     #print "Number of files: " + str(nfiles)
-    
-    # Read data from the first file
-    f = DataFile(file_list[0])
-    
+
+    file_list2 = glob.glob(os.path.join(path, prefix+".0.nc"))
+    if file_list2 != []:
+        f = DataFile(file_list2[0])
+        print "Getting settings from " + file_list2[0]
+    else:
+        # Read data from the first file
+        f = DataFile(file_list[0])
+        print "Getting settings from " + file_list[0]
     #print "File format    : " + f.file_format
     try:
         dimens = f.dimensions(varname)
