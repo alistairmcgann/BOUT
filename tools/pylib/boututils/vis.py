@@ -17,7 +17,7 @@ engine.new_scene()
 mlabscene = engine.scenes[0]
 mlab.show_pipeline()
 
-data = np.load('./dtime.npy')
+data = np.load('/home/adm518/Documents/dtime.npy')
 
 # The buffer stores a number of scalar fields
 # The buffer index stores the locations of the scalar fields in the buffer
@@ -30,7 +30,7 @@ buff_fields = list(range(buff_size))
 for i in range(buff_size):
     buff_index.append(i)
     buff_times.insert(0, i)
-    buff_fields[i] = mlab.pipeline.volume(mlab.pipeline.scalar_field(data[0,:,:,:], name='dat'+str(0)), figure=mlabscene)
+    buff_fields[i] = mlab.pipeline.scalar_field(data[0,:,:,:], name='dat'+str(0), figure=mlabscene)
 
 #Returns the dataset from the variable to be plotted, here for a given time
 def density(t):
@@ -39,13 +39,24 @@ def density(t):
         # Remove the least recently used index
         n = buff_index.popleft()
 
-        mlabscene.children.remove('dat'+str(buff_times[n]))
-        gc.collect()
+        # Clear that whole scene, and clean up
+        mlabscene.children[n-buff_size].remove()
+#        gc.collect()
 
         # Insert the new time into the time list
         buff_times[n] = t
         # Create the field and insert it in the fields list
-        buff_fields[n] = mlab.pipeline.volume(mlab.pipeline.scalar_field(data[t,:,:,:], name='dat'+str(t) ), figure=mlabscene)
+        buff_fields[n] = mlab.pipeline.scalar_field(data[t,:,:,:], name='dat'+str(t) , figure=mlabscene)
+#        buff_fields[n].spacing=[1.,20.,1.]
+
+        mlabscene.children[n] = buff_fields[n]
+
+
+        # Hide everything apart from the requested time
+        for i in range(buff_size):
+            mlabscene.children[i].visible = False
+
+        mlabscene.children[n].visible = True
 
 #        mlabscene.children[n] = buff_fields[n]
 #        mlabscene.add_filter(mlab.pipeline.volume(buff_fields[n]))
@@ -65,7 +76,11 @@ def density(t):
             buff_index.rotate()
             n = buff_index[-1]
         
-#        return n
+        # Hide everything apart from the requested time
+        for i in range(buff_size):
+            mlabscene.children[i].visible = False
+
+        mlabscene.children[n].visible = True
 
     return buff_fields[n]
 
@@ -75,15 +90,11 @@ class Visualisation(HasTraits):
     plot = Instance(PipelineBase)
 
     @on_trait_change('time, scene.activated')
-
-#    density(self.time, self)
-
     def update_plot(self):
-#        self.plot = mlab.pipeline.volume(density(self.time), figure=self.scene)
-        self.plot = density(self.time)
+        self.plot = mlab.pipeline.volume(density(self.time))
 #        self.plot = mlabscene.children[density(self.time)].pop()
 
-    mlab.view(figure=mlabscene)
+#    mlab.view(figure=mlabscene)
 #    view = View(Item('scene', editor=SceneEditor(scene_class=MayaviScene), height=250, width=300, show_label=False), Group( '_', 'time', ), resizable=True, )
 
 vis = Visualisation()
