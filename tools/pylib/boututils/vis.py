@@ -29,9 +29,10 @@ buff_times = []
 buff_fields = list(range(buff_size))
 for i in range(buff_size):
     buff_index.append(i)
-    buff_times.insert(0, i)
-    buff_fields[i] = mlab.pipeline.scalar_field(data[0,:,:,:], name='dat'+str(0), figure=mlabscene)
-
+    buff_times.insert(i, 0)
+    mlabscene.children[i] = mlab.pipeline.scalar_field(data[0,:,:,:], name='dat'+str(0))
+#    buff_fields[i] = mlab.pipeline.scalar_field(data[0,:,:,:], name='dat'+str(0), figure=mlabscene)
+print buff_times
 #Returns the dataset from the variable to be plotted, here for a given time
 def density(t):
     # If not already loaded:
@@ -91,7 +92,56 @@ class Visualisation(HasTraits):
 
     @on_trait_change('time, scene.activated')
     def update_plot(self):
-        self.plot = mlab.pipeline.volume(density(self.time))
+        print buff_times.count(self.time)
+        print buff_times
+
+    # If not already loaded:
+        if buff_times.count(self.time) == 0:
+        # Remove the least recently used index
+            n = buff_index.popleft()
+
+        # Clear that whole scene, and clean up
+            mlabscene.children[n].remove()
+            gc.collect()
+
+        # Insert the new time into the time list
+            buff_times[n] = self.time
+
+        # Replace the fields
+            mlabscene.children[n] = mlab.pipeline.scalar_field(data[self.time,:,:,:], name='dat'+str(self.time))
+
+        # Draw a new volume
+            mlabscene.children[n].children[0] = mlab.pipeline.volume(mlabscene.children[n])
+
+        # Hide everything apart from the requested time
+            for i in range(buff_size):
+                mlabscene.children[i].visible = False
+
+            mlabscene.children[n].visible = True
+
+        # It's now the most recently used index
+            buff_index.append(n)
+
+        else:
+        # Find which index that time is at
+            i = buff_times.index(self.time)
+            print i
+        # Rotate the recent use index 'till that's at the front
+            n = buff_index[-1]
+            while n != i:
+                buff_index.rotate(-1)
+                n = buff_index[-1]
+        
+        # Hide everything apart from the requested time
+        for f in range(buff_size):
+            mlabscene.children[f].visible = False
+
+        # Clear and redraw the requested slice
+        mlabscene.children[n].children[0].remove()
+        mlabscene.children[n].children[0] = mlab.pipeline.volume(mlabscene.children[n])
+        mlabscene.children[n].visible = True
+
+#        self.plot = mlab.pipeline.volume(density(self.time))
 #        self.plot = mlabscene.children[density(self.time)].pop()
 
 #    mlab.view(figure=mlabscene)
