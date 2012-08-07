@@ -92,8 +92,9 @@ class Visualisation(HasTraits):
 
         # Clear and redraw the requested slice
 #        mlabscene.children[n].children[0].remove()
-        mlabscene.children[n].children[0] = mlab.pipeline.volume(mlabscene.children[n])
         mlabscene.children[n].visible = True
+        mlabscene.children[n].children[0] = mlab.pipeline.volume(mlabscene.children[n])
+
 
 vis = Visualisation()
 vis.configure_traits()
