@@ -5,7 +5,7 @@ from boutdata import collect
 # Load in the datafile as a BOUT DataFile object
 # path links to the directory containing the data
 # file1 is the first file in this subdirectory (NB requires / at start)
-path = '/hwdisks/data/adm518/RUN1'
+path = '/hwdisks/home/nrw504/BOUT/blobsims/3DMASTmodel/RUNS/RUN13'
 file1 = '/BOUT.dmp.0.nc'
 
 f = DataFile()
