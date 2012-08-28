@@ -31,6 +31,20 @@ def field_trace(data, grid_file, x_0=-1, z_0=-1):
         g33 = (Bxy[x,y])**2 / (( Rxy[x,y] * Bpxy[x,y])**2 )
         return  np.array([[g11,g12,g13], [g12,g22,g23], [g13,g23,g33]])
 
+    # Perform all of the interpolation, store the coefficients in 
+    # list 'tck', which is called when any values in the [x,z] plane
+    # are required
+
+    tck = range(ny)
+    for j in tck:
+#        print nx, j
+        intrp = interpolate.RectBivariateSpline(range(nx),range(nz),data[:,j,:],kx=3,ky=3)
+        tx,ty= intrp.get_knots()
+        np.shape((tx,ty,intrp.get_coeffs(),3,3))
+        tck[j] = (tx,ty,intrp.get_coeffs(),3,3)
+
+#    np.shape(tck[1])
+
     def apar_intrp(x,y,z):
 
         dx = dx_xy[x,y]
@@ -38,18 +52,24 @@ def field_trace(data, grid_file, x_0=-1, z_0=-1):
         
         
         # Interpolating down the y-axis (along the field)
-        dy_coeffs = interpolate.splrep(range(ny), data[x,:,z], k=3)
+        y_vals = np.array(range(ny), dtype=float)
+
+        for j in range(len(y_vals)):
+            y_vals[j] = interpolate.bisplev(x,z,tck[j])
+#        print y_vals, 'sdf'
+        dy_coeffs = interpolate.splrep(range(ny), y_vals, k=3)
         
         # Interpolating along the slices of data
-        intrp = interpolate.RectBivariateSpline(range(nx),range(nz),data[:,y,:],kx=3,ky=3)
+#        intrp = interpolate.RectBivariateSpline(range(nx),range(nz),data[:,y,:],kx=3,ky=3)
         
-        tx,ty = intrp.get_knots()
-        tck = (tx,ty,intrp.get_coeffs(),3,3)
-        
+#        tx,ty = intrp.get_knots()
+#        tck = (tx,ty,intrp.get_coeffs(),3,3)
+#        print y, int(y), np.shape(data[:,y,:])
         # From the cubic spline coefficients, returns derivatives
-        dervs = ( interpolate.bisplev(x,z,tck, dx=1, dy=0)/dx,
+#        print 's', int(np.rint(y)), int(y)
+        dervs = ( interpolate.bisplev(x,z,tck[int(np.rint(y))], dx=1, dy=0)/dx,
                   interpolate.splev(y,dy_coeffs,der=1)/dy,
-                  interpolate.bisplev(x,z,tck, dx=0, dy=1)/dz )
+                  interpolate.bisplev(x,z,tck[int(np.rint(y))], dx=0, dy=1)/dz )
 
         return  dervs
 
