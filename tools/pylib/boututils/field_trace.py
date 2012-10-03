@@ -1,16 +1,23 @@
 import numpy as np
 from scipy import interpolate, integrate, optimize
 
-def field_trace(data, grid_file, x_0=-1, z_0=-1):
-    ''' Returns a 2D array containing 3 co-ordinates of a line of constant field
-value down the y-axis of a set of data.
+def field_trace(data, grid_file, x_0=-1, z_0=-1, tck = None, full_output = None):
+    ''' Returns a 2D array containing 3
+    co-ordinates of a line of constant field value down the y-axis of
+    a set of data.
 
-x_0 and z_0 are the initial x and z positions of the field line, the value at which is
-held constant throughout the line. If less than zero, or outside the range of data passed
-to it, random starting points are chosen for the data.
-The forth dimension of the output is the value of the data at that (x,y,z) location, which
-should be constant. '''
+x_0 and z_0 are the initial x and z positions of the field line, the
+value at which is held constant throughout the line. If less than
+zero, or outside the range of data passed to it, random starting
+points are chosen for the data.  The forth dimension of the output is
+the value of the data at that (x,y,z) location, which should be
+constant.
 
+If interpolation of the data has already been performed, the spline
+knots and cubic coefficients can be passed through the 'tck'
+argument. If these values are required, because the data does not
+change, they can be produced by setting the 'full_output' keyword
+argument to 1, which produces a suitable array as its second output.'''
 
     Bxy  = grid_file['Bxy']
     Bpxy = grid_file['Bpxy']
@@ -21,10 +28,11 @@ should be constant. '''
     dx_xy = grid_file['dx']
     dy_xy = grid_file['dy']
     dz    = 2.*np.pi/64.
-    
+
     nx = grid_file['nx']
     ny = grid_file['ny']
-    
+
+#    nx,ny,nz = data.shape
     nz = data.shape[2]
 
 # Calculate the metric tensor at location x,y
@@ -44,15 +52,18 @@ should be constant. '''
     # list 'tck', which is called when any values in the [x,z] plane
     # are required
 
-    tck = range(ny)
-    for j in tck:
-#        print nx, j
-        intrp = interpolate.RectBivariateSpline(range(nx),range(nz),data[:,j,:],kx=3,ky=3)
-        tx,ty= intrp.get_knots()
-        np.shape((tx,ty,intrp.get_coeffs(),3,3))
-        tck[j] = (tx,ty,intrp.get_coeffs(),3,3)
+    if tck is None:
 
-#    np.shape(tck[1])
+#        del tck
+        tck = range(ny)
+        for j in tck:
+            #        print nx, j, data.shape
+            intrp = interpolate.RectBivariateSpline(range(nx),range(nz),data[:,j,:],kx=3,ky=3)
+            tx,ty= intrp.get_knots()
+            np.shape((tx,ty,intrp.get_coeffs(),3,3))
+            tck[j] = (tx,ty,intrp.get_coeffs(),3,3)
+
+            #    np.shape(tck[1])
 
     def apar_intrp(x,y,z):
 
@@ -81,14 +92,6 @@ should be constant. '''
                   interpolate.bisplev(x,z,tck[int(np.rint(y))], dx=0, dy=1)/dz )
 
         return  dervs
-
-# A function for the bracketing that returns the difference between
-# the value of the field at the current point on the field line
-#    def diff(xy,z):
-#        
-#        return data[x,y,:] - d[3,0]
-#    def diffz(z,y):
-#        return data[:,y,z] - d[3,0]
 
 # From the metric tensor and derivatives returns the pertubation
     def follow_field(x,y,z):
@@ -147,4 +150,7 @@ should be constant. '''
             print x_0,z_0
             break
 
-    return d
+    if full_output is not None:
+        return d, tck
+    else:
+        return d

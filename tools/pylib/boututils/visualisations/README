@@ -1,0 +1,31 @@
+BOUT++ python visualisation routines
+
+Dependencies
+======================
+
+o Scipy/Numpy			For loading NetCDF files, arrays
+o Mayavi2		    	For creating the visualisations
+o BOUT collection routines  	Loading in the data
+
+Recommended
+======================
+
+o IPython			Mayavi2 scripts run better within IPython over the default interpreter
+
+Scripts available
+======================
+
+o mlab.py
+
+Plots up to 2 scalar fields against each other, one in a volume and
+the other as slices evenly distributed.
+
+o vis/vis2.py
+
+Generates an interactive plot that can contain many different time
+slices.  Has ability to select fewer data points to increase speed of
+plotting
+
+o fmlab.py
+
+A callable function that generates a plot similar to that by mlab.py

@@ -17,7 +17,7 @@ engine.new_scene()
 mlabscene = engine.scenes[0]
 mlab.show_pipeline()
 
-data = np.load('/home/adm518/Documents/dtime.npy')
+data = np.load('/hwdisks/data/adm518/d2.npy')
 
 spacing = [1.,20.,1.]
 

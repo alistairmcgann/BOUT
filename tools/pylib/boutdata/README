@@ -1,0 +1,20 @@
+BOUT++ Variable loading routine
+
+Dependencies
+====================
+
+o Scipy/Numpy		For manipulations of arrays
+o BOUT python routines	For collection of the data
+
+Scripts available
+====================
+
+o loadvariable.py
+
+A front-end to the collect routines which displays to the user all the variables in a BOUT file
+(as determined in the source code), its dimensions and allows the user to slice up the arrays
+if they have 4 dimensions. Currently allows the user to save the data to numpy format.
+
+o guiloadvariable.py
+
+A (mostly abandoned) project to write a GUI frontend to the above routine.
