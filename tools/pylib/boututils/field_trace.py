@@ -1,7 +1,16 @@
 import numpy as np
-from scipy import interpolate, integrate
+from scipy import interpolate, integrate, optimize
 
 def field_trace(data, grid_file, x_0=-1, z_0=-1):
+    ''' Returns a 2D array containing 3 co-ordinates of a line of constant field
+value down the y-axis of a set of data.
+
+x_0 and z_0 are the initial x and z positions of the field line, the value at which is
+held constant throughout the line. If less than zero, or outside the range of data passed
+to it, random starting points are chosen for the data.
+The forth dimension of the output is the value of the data at that (x,y,z) location, which
+should be constant. '''
+
 
     Bxy  = grid_file['Bxy']
     Bpxy = grid_file['Bpxy']
@@ -73,6 +82,14 @@ def field_trace(data, grid_file, x_0=-1, z_0=-1):
 
         return  dervs
 
+# A function for the bracketing that returns the difference between
+# the value of the field at the current point on the field line
+#    def diff(xy,z):
+#        
+#        return data[x,y,:] - d[3,0]
+#    def diffz(z,y):
+#        return data[:,y,z] - d[3,0]
+
 # From the metric tensor and derivatives returns the pertubation
     def follow_field(x,y,z):
         g = metric(x,y)
@@ -100,7 +117,7 @@ def field_trace(data, grid_file, x_0=-1, z_0=-1):
 
     d = np.ndarray([4,ny-1],dtype=float)
 
-    r = integrate.ode(fieldline).set_integrator('dopri5', first_step = 0.5)
+    r = integrate.ode(fieldline).set_integrator('dopri5', first_step = 0.5, max_step=0.5)
     r.set_initial_value([x_0,z_0], 0)
     d[:,0] = x_0,0,z_0,data[x_0,0,z_0]
     for y in range(1,ny-1):
@@ -110,9 +127,19 @@ def field_trace(data, grid_file, x_0=-1, z_0=-1):
             d[:,y:] = np.nan
             print x_0,z_0
             break
-
         x = r.y[0]
         z = r.y[1]
+
+#        if x<data.shape[0] and z<data.shape[2]:
+#            print x, z, data.shape[0], data.shape[2]
+#            (xd, zd, t) = optimize.fsolve(diff,[x,z],args=(y))
+#        else:
+#            t = 0
+
+#        if t==1:
+#            x = xd
+#            z = zd
+
         try:
             d[:,r.t] = x,y,z,data[x,y,z]
         except IndexError:

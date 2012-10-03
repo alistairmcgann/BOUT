@@ -18,8 +18,10 @@ def aligned_points(grid, nz=1, period=1.0, maxshift=0.4):
     except:
         print "Missing required data"
         return None
+
     
     dz = 2.*pi / (period * (nz-1))
+
     phi0 = np.linspace(0,2.*pi / period, nz)
     
     # Need to insert additional points in Y so mesh looks smooth

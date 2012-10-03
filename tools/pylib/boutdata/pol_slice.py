@@ -19,8 +19,8 @@ except ImportError:
 
 def pol_slice(var3d, gridfile, n=1, zangle=0.0):
     """ data2d = pol_slice(data3d, 'gridfile', n=1, zangle=0.0) """
-    n = int(n)
-    zangle = float(zangle)
+    n = np.rint(n)
+    zangle = np.float64(zangle)
 
     s = np.shape(var3d)
     if len(s) != 3:
@@ -29,11 +29,11 @@ def pol_slice(var3d, gridfile, n=1, zangle=0.0):
 
     nx, ny, nz = s
 
-    dz = 2.*np.pi / float(n * (nz-1))
+    dz = 2.*np.pi / np.float64(n * (nz-1))
 
     try:
         # Open the grid file
-        gf = Datafile(gridfile)
+        gf = DataFile(gridfile)
 
         # Check the grid size is correct
         if gf.read("nx") != nx:
@@ -67,8 +67,8 @@ def pol_slice(var3d, gridfile, n=1, zangle=0.0):
     # Perform 2D slice
         
     zind = (zangle - zShift) / dz
-    z0 = int(np.floor(zind))
-    p = zind - float(z0)
+    z0 = np.int16(np.floor(zind))
+    p = zind - np.float64(z0)
     
     # Make z0 between 0 and (nz-2)
     z0 = ((z0 % (nz-1)) + (nz-1)) % (nz-1)
